@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Ferme de Demain - Plan d'Architecture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+        
+        .tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .module {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .module:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .module h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .module ul {
+            list-style: none;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .module ul li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .module ul li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+        }
+        
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .tech-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .tech-item h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .phase {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #667eea;
+        }
+        
+        .phase h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .phase ul {
+            margin-left: 20px;
+        }
+        
+        .phase ul li {
+            margin: 8px 0;
+        }
+        
+        .diagram {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .flow-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .flow-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            min-width: 150px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .tabs {
+                justify-content: center;
+            }
+            
+            .tab {
+                flex: 1;
+                min-width: 150px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌾 La Ferme de Demain</h1>
+            <p>Plan d'Architecture - Assistant IA pour Gestion Agricole</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('architecture')">📐 Architecture</div>
+            <div class="tab" onclick="showTab('modules')">🔧 Modules</div>
+            <div class="tab" onclick="showTab('tech')">💻 Technologies</div>
+            <div class="tab" onclick="showTab('features')">⭐ Fonctionnalités</div>
+            <div class="tab" onclick="showTab('phases')">🚀 Plan de Dev</div>
+        </div>
+        
+        <div id="architecture" class="content active">
+            <h2 style="color: #667eea; margin-bottom: 20px;">Architecture du Système</h2>
+            
+            <div class="diagram">
+                <div class="flow-container">
+                    <div class="flow-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        👤 Interface Utilisateur (Web + Mobile)
+                    </div>
+                    <div class="arrow">↓</div>
+                    <div class="flow-row">
+                        <div class="flow-box">🎤 Assistant IA (NLP)</div>
+                        <div class="flow-box">🔐 Authentification</div>
+                        <div class="flow-box">📊 API REST</div>
+                    </div>
+                    <div class="arrow">↓</div>
+                    <div class="flow-row">
+                        <div class="flow-box">💼 Gestion Commerciale</div>
+                        <div class="flow-box">🌱 Gestion Agricole</div>
+                        <div class="flow-box">📄 Générateur PDF</div>
+                    </div>
+                    <div class="arrow">↓</div>
+                    <div class="flow-row">
+                        <div class="flow-box">💾 Base de Données</div>
+                        <div class="flow-box">📁 Stockage Fichiers</div>
+                        <div class="flow-box">📧 Service Email</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 style="color: #667eea; margin: 30px 0 15px 0;">Principes d'Architecture</h3>
+            <div class="architecture-grid">
+                <div class="module">
+                    <h3>🏗️ Architecture</h3>
+                    <ul>
+                        <li>Architecture modulaire</li>
+                        <li>API RESTful</li>
+                        <li>Microservices légers</li>
+                        <li>Progressive Web App</li>
+                    </ul>
+                </div>
+                <div class="module">
+                    <h3>📱 Multi-plateforme</h3>
+                    <ul>
+                        <li>Responsive design</li>
+                        <li>App mobile native</li>
+                        <li>Mode hors-ligne</li>
+                        <li>Sync automatique</li>
+                    </ul>
+                </div>
+                <div class="module">
+                    <h3>🔒 Sécurité</h3>
+                    <ul>
+                        <li>Authentification JWT</li>
+                        <li>Chiffrement des données</li>
+                        <li>RGPD compliant</li>
+                        <li>Backup automatique</li>
+                    </ul>
+                </div>
+                <div class="module">
+                    <h3>⚡ Performance</h3>
+                    <ul>
+                        <li>Cache intelligent</li>
+                        <li>Lazy loading</li>
+                        <li>CDN pour assets</li>
+                        <li>Optimisation mobile</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div id="modules" class="content">
+            <h2 style="color: #667eea; margin-bottom: 20px;">Modules Principaux</h2>
+            
+            <div class="architecture-grid">
+                <div class="module">
+                    <h3>🤖 Assistant IA</h3>
+                    <ul>
+                        <li>Reconnaissance vocale</li>
+                        <li>NLP (traitement langage)</li>
+                        <li>Actions automatisées</li>
+                        <li>Suggestions intelligentes</li>
+                        <li>Historique commandes</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h3>📦 Gestion Commandes</h3>
+                    <ul>
+                        <li>Création commandes</li>
+                        <li>Suivi statuts</li>
+                        <li>Gestion clients</li>
+                        <li>Historique achats</li>
+                        <li>Rappels livraison</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h3>🌱 Gestion Cultures</h3>
+                    <ul>
+                        <li>Calendrier cultures</li>
+                        <li>Suivi parcelles</li>
+                        <li>Rendements prévus</li>
+                        <li>Alertes récolte</li>
+                        <li>Rotation cultures</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h3>💰 Facturation</h3>
+                    <ul>
+                        <li>Création devis/factures</li>
+                        <li>Génération PDF auto</li>
+                        <li>Envoi email auto</li>
+                        <li>Suivi paiements</li>
+                        <li>Relances auto</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h3>📊 Tableau de Bord</h3>
+                    <ul>
+                        <li>CA temps réel</li>
+                        <li>Graphiques ventes</li>
+                        <li>Rendements agricoles</li>
+                        <li>Indicateurs clés</li>
+                        <li>Export rapports</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h3>📦 Gestion Stocks</h3>
+                    <ul>
+                        <li>Inventaire temps réel</li>
+                        <li>Alertes stock bas</li>
+                        <li>Traçabilité produits</li>
+                        <li>Dates péremption</li>
+                        <li>Mouvements stock</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h3>👥 CRM Clients</h3>
+                    <ul>
+                        <li>Fiches clients</li>
+                        <li>Préférences produits</li>
+                        <li>Historique achats</li>
+                        <li>Programme fidélité</li>
+                        <li>Communications</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h3>📅 Planification</h3>
+                    <ul>
+                        <li>Calendrier travaux</li>
+                        <li>Rappels tâches</li>
+                        <li>Météo intégrée</li>
+                        <li>Planning livraisons</li>
+                        <li>Gestion équipe</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tech" class="content">
+            <h2 style="color: #667eea; margin-bottom: 20px;">Stack Technologique Recommandée</h2>
+            
+            <h3 style="margin: 20px 0;">Frontend</h3>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <h4>⚛️ React + Next.js</h4>
+                    <p>Framework principal pour web et PWA, SEO-friendly</p>
+                </div>
+                <div class="tech-item">
+                    <h4>📱 React Native</h4>
+                    <p>Application mobile iOS et Android native</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🎨 Tailwind CSS</h4>
+                    <p>Styling moderne et responsive</p>
+                </div>
+                <div class="tech-item">
+                    <h4>📊 Recharts / Chart.js</h4>
+                    <p>Visualisation données et graphiques</p>
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 20px 0;">Backend</h3>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <h4>🟢 Node.js + Express</h4>
+                    <p>API RESTful rapide et scalable</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🐘 PostgreSQL</h4>
+                    <p>Base de données relationnelle robuste</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🔥 Firebase / Supabase</h4>
+                    <p>Alternative: backend as a service</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🗄️ Redis</h4>
+                    <p>Cache et sessions</p>
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 20px 0;">IA & Services</h3>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <h4>🤖 OpenAI / Claude API</h4>
+                    <p>Assistant IA conversationnel</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🎤 Web Speech API</h4>
+                    <p>Reconnaissance vocale native</p>
+                </div>
+                <div class="tech-item">
+                    <h4>📄 jsPDF / PDFKit</h4>
+                    <p>Génération PDF serveur</p>
+                </div>
+                <div class="tech-item">
+                    <h4>📧 SendGrid / Resend</h4>
+                    <p>Service d'envoi emails</p>
+                </div>
+                <div class="tech-item">
+                    <h4>☁️ AWS S3 / Cloudinary</h4>
+                    <p>Stockage fichiers et images</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🌤️ OpenWeather API</h4>
+                    <p>Données météo temps réel</p>
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 20px 0;">DevOps & Hébergement</h3>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <h4>🚀 Vercel / Netlify</h4>
+                    <p>Hébergement frontend</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🐳 Docker</h4>
+                    <p>Conteneurisation</p>
+                </div>
+                <div class="tech-item">
+                    <h4>📝 Git + GitHub</h4>
+                    <p>Versionning code</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🔄 GitHub Actions</h4>
+                    <p>CI/CD automatisé</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="features" class="content">
+            <h2 style="color: #667eea; margin-bottom: 20px;">Fonctionnalités Détaillées</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">🎤</div>
+                    <h4>Commandes Vocales</h4>
+                    <p>"Crée une facture pour Le Bistrot : 10kg framboises à 8,50€"</p>
+                    <p>L'IA comprend, exécute et confirme l'action</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">💬</div>
+                    <h4>Chat Intelligent</h4>
+                    <p>Interface conversationnelle naturelle</p>
+                    <p>Suggestions contextuelles, historique des échanges</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h4>Dashboard Agricole</h4>
+                    <p>Vue d'ensemble temps réel : ventes, stocks, cultures</p>
+                    <p>KPI personnalisables, alertes intelligentes</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">📱</div>
+                    <h4>Mode Hors-ligne</h4>
+                    <p>Fonctionne sans connexion aux champs</p>
+                    <p>Synchronisation automatique au retour réseau</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">🔔</div>
+                    <h4>Notifications Push</h4>
+                    <p>Rappels récoltes, paiements en retard</p>
+                    <p>Alertes météo, confirmations commandes</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">📄</div>
+                    <h4>Génération Auto PDF</h4>
+                    <p>Devis et factures professionnels</p>
+                    <p>Modèles personnalisables, envoi automatique</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">🌦️</div>
+                    <h4>Météo Intégrée</h4>
+                    <p>Prévisions locales temps réel</p>
+                    <p>Conseils cultures selon météo</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">📸</div>
+                    <h4>Photos Produits</h4>
+                    <p>Galerie photos cultures et produits</p>
+                    <p>Documentation visuelle récoltes</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">💳</div>
+                    <h4>Suivi Paiements</h4>
+                    <p>Statuts paiements en temps réel</p>
+                    <p>Relances automatiques, rapports financiers</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">📈</div>
+                    <h4>Analyses Prédictives</h4>
+                    <p>Prévisions ventes et rendements</p>
+                    <p>Recommandations IA basées sur historique</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">🏷️</div>
+                    <h4>Étiquettes & QR Codes</h4>
+                    <p>Génération étiquettes produits</p>
+                    <p>QR codes pour traçabilité</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">🗺️</div>
+                    <h4>Cartographie Parcelles</h4>
+                    <p>Visualisation parcelles sur carte</p>
+                    <p>Suivi cultures par zone</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="phases" class="content">
+            <h2 style="color: #667eea; margin-bottom: 20px;">Plan de Développement par Phases</h2>
+            
+            <div class="phase">
+                <h3>📋 Phase 1 : MVP (4-6 semaines)</h3>
+                <ul>
+                    <li><strong>Setup projet :</strong> Architecture, base de données, authentification</li>
+                    <li><strong>Interface de base :</strong> Dashboard simple, navigation</li>
+                    <li><strong>Gestion commandes :</strong> CRUD commandes et clients</li>
+                    <li><strong>Facturation basique :</strong> Génération PDF manuelle</li>
+                    <li><strong>Déploiement :</strong> Version web responsive</li>
+                </ul>
+            </div>
+            
+            <div class="phase">
+                <h3>🤖 Phase 2 : Intelligence IA (4-5 semaines)</h3>
+                <ul>
+                    <li><strong>Intégration IA :</strong> API Claude/OpenAI</li>
+                    <li><strong>Commandes texte :</strong> Chat conversationnel avec actions</li>
+                    <li><strong>Reconnaissance vocale :</strong> Input vocal pour commandes</li>
+                    <li><strong>Automatisation :</strong> Génération et envoi auto PDF</li>
+                    <li><strong>Suggestions IA :</strong> Recommandations intelligentes</li>
+                </ul>
+            </div>
+            
+            <div class="phase">
+                <h3>🌱 Phase 3 : Gestion Agricole (4-5 semaines)</h3>
+                <ul>
+                    <li><strong>Gestion cultures :</strong> Calendrier, parcelles, rotations</li>
+                    <li><strong>Gestion stocks :</strong> Inventaire, alertes, traçabilité</li>
+                    <li><strong>Planification :</strong> Tâches, rappels, équipe</li>
+                    <li><strong>Météo :</strong> Intégration API météo</li>
+                    <li><strong>Analytics :</strong> Tableaux de bord avancés</li>
+                </ul>
+            </div>
+            
+            <div class="phase">
+                <h3>📱 Phase 4 : Mobile & Avancé (5-6 semaines)</h3>
+                <ul>
+                    <li><strong>App mobile :</strong> React Native iOS + Android</li>
+                    <li><strong>Mode hors-ligne :</strong> Sync automatique</li>
+                    <li><strong>Notifications push :</strong> Alertes et rappels</li>
+                    <li><strong>CRM avancé :</strong> Fidélisation, historique</li>
+                    <li><strong>Photos & médias :</strong> Galerie produits</li>
+                </ul>
+            </div>
+            
+            <div class="phase">
+                <h3>🚀 Phase 5 : Optimisations (3-4 semaines)</h3>
+                <ul>
+                    <li><strong>Performance :</strong> Cache, optimisations</li>
+                    <li><strong>Tests :</strong> Tests utilisateurs, ajustements</li>
+                    <li><strong>Sécurité :</strong> Audit, conformité RGPD</li>
+                    <li><strong>Documentation :</strong> Guide utilisateur, tutoriels</li>
+                    <li><strong>Support :</strong> Système d'aide intégré</li>
+                </ul>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 10px; color: white; margin-top: 30px;">
+                <h3 style="margin-bottom: 15px;">⏱️ Timeline Total Estimé</h3>
+                <p style="font-size: 1.2em; margin-bottom: 10px;"><strong>20-26 semaines (5-6 mois)</strong></p>
+                <p>Avec possibilité de lancement MVP en 1.5-2 mois pour commencer les tests terrain rapidement.</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                <h3 style="color: #667eea; margin-bottom: 10px;">💡 Recommandations</h3>
+                <ul style="margin-left: 20px;">
+                    <li>Commencer par MVP simple pour valider le concept</li>
+                    <li>Tests réguliers avec utilisateurs agriculteurs</li>
+                    <li>Itérations rapides basées sur feedback</li>
+                    <li>Priorité à l'UX simple et intuitive</li>
+                    <li>Documentation continue du code</li>
+                    <li>Backup automatique des données critiques</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // Hide all content
+            const contents = document.querySelectorAll('.content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
